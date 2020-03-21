@@ -335,28 +335,7 @@ def vortex(N,tmax,nmax,dt,g1,M,g):
             vv3_euler[k,:] = vvnew3_euler
             U_euler[k,:,2]= vvnew3_euler 
             
-            
-         
-            
-       
-        # on hu
-           
-        U[0,:,2] = 0#  U[-1,:,1]
         
-        U[-1,:,2] =  0#U[0,:,1]
-       # U[:,0,2] = 0#  U[-1,:,1]
-        
-       # U[:,-1,2] =  0#U[0,:,1]
-           
-           
-       
-        # on hu
-           
-        #U[:,0,1] =  0#U[-1,:,2]
-        #U[:,-1,1] = 0# U[0,:,2
-        U[:,0,1] = 0#  U[-1,:,1]
-        
-        U[:,-1,1] =  0#U[0,:,1]
            
         F,G = convert(U,F,G,N,tmax,t,g1,M,g) 
         n = n+1
@@ -381,17 +360,34 @@ def vortex(N,tmax,nmax,dt,g1,M,g):
         print(max_valx)
         print(max_valy)
         dt = (.95*dx)/(np.abs(max_valx+max_valy))
+        
+          # on hu
+           
+        U[0,:,2] = 0#  U[-1,:,1]
+        
+        U[-1,:,2] =  0#U[0,:,1]
+       # U[:,0,2] = 0#  U[-1,:,1]
+        
+       # U[:,-1,2] =  0#U[0,:,1]
+        
+        # on hu
+           
+        #U[:,0,1] =  0#U[-1,:,2]
+        #U[:,-1,1] = 0# U[0,:,2
+        U[:,0,1] = 0#  U[-1,:,1]
+        
+        U[:,-1,1] =  0#U[0,:,1]
                                                                                                              
             
     return U, H0_two, H0, U_euler , U0, V0, H0
 
 
 
-ni = [40,50,60,70,80]
+ni = [40,50,60,70,80,100]
 #ni = [50]
-linf = np.zeros(5)
-linf_euler = np.zeros(5)
-N= np.zeros(5)
+linf = np.zeros(6)
+linf_euler = np.zeros(6)
+N= np.zeros(6)
 k=0
 for i in ni:
 
