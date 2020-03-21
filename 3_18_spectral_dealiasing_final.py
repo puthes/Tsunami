@@ -35,68 +35,9 @@ def matrix_antialiasing(h,m):
 ### integrating factor method
 
     #######################################
-#############gaussian        
-##x = np.arange(-5,5,0.1)
-##y = np.arange(-5,5,0.1)
-##X,Y = np.meshgrid(x,y)
-##Z555 = np.exp(-(X-3)**2 - (Y-3)**2)  
-
-#U0 = np.zeros((len(x),len(x)))#kernel  # 12/8 i changed the tmax to t
-#V0 = np.zeros((len(x),len(x)))#kernel   
-#H0 = Z555           
-
-def swe(U0,V0,H0):    
-    
-    
-    U = np.zeros((len(x),len(x),3)) 
-    F = np.zeros((len(x),len(x),3)) 
-    G = np.zeros((len(x),len(x),3)) 
-    U1 = np.zeros((len(x),len(x),3)) 
-    F1 = np.zeros((len(x),len(x),3)) 
-    G1 = np.zeros((len(x),len(x),3)) 
-    ###
-    H2 = np.zeros((len(x),len(x)))
-    HU = np.zeros((len(x),len(x)))
-    HV = np.zeros((len(x),len(x)))
-    V2 = np.zeros((len(x),len(x)))
-    HUU = np.zeros((len(x),len(x)))
-    HUV = np.zeros((len(x),len(x)))
-    HVV = np.zeros((len(x),len(x)))
-    
-     
-    Y = np.fft.fft2(H0) # fft computing and normalization
-    Y2 = np.fft.fft2(U0) 
-    Y3 = np.fft.fft2(V0) 
-    H2_temp= matrix_antialiasing(Y,Y)
-    UU_temp= matrix_antialiasing(Y2,Y2)
-    HU_temp= matrix_antialiasing(Y,Y2)
-    HV_temp= matrix_antialiasing(Y,Y3)
-    V2_temp= matrix_antialiasing(Y3,Y3)
-            
-    HUU_temp= matrix_antialiasing(UU_temp,Y)
-        #HUU_temp= antialiasing(HU_temp,Y2)
-    HUV_temp= matrix_antialiasing(HU_temp,Y3)
-    HVV_temp= matrix_antialiasing(Y,V2_temp)
         
-        
-        #HVV_temp= antialiasing(Y,V2_temp)
-    H2 = real(np.fft.ifft2(H2_temp))
-    HU = real(np.fft.ifft2(HU_temp))
-    HV = real(np.fft.ifft2(HV_temp))
-    V2 = real(np.fft.ifft2(V2_temp))
-    HUU = real(np.fft.ifft2(HUU_temp))
-    HUV = real(np.fft.ifft2(HUV_temp))
-    HVV = real(np.fft.ifft2(HVV_temp))
+
    
-    ############
-    U1[:,:,0]=H0
-    U1[:,:,1]=HU
-    U1[:,:,2]=HV
-
-    U[:,:,0] = (U1[:,:,0]) # fft computing and normalization
-    U[:,:,1] = (U1[:,:,1]) 
-    U[:,:,2] = (U1[:,:,2])
-    return U
         
    
       
