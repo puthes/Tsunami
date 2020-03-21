@@ -360,7 +360,27 @@ def vortex(N,tmax,nmax,dt,g1,M,g):
            
         F,G = convert(U,F,G,N,tmax,t,g1,M,g) 
         n = n+1
-        dt = (.95*dx)/(np.abs(np.max(U[:,:,1]/U[:,:,0])+np.max(U[:,:,2]/U[:,:,0])))
+        
+        ux=U[:,:,1]/U[:,:,0]
+        vy=U[:,:,2]/U[:,:,0]
+        
+        r = ux + np.sqrt(np.abs(g*U[:,:,0]))
+        r1 = ux - np.sqrt(np.abs(g*U[:,:,0]))
+        rr = vy + np.sqrt(np.abs(g*U[:,:,0]))
+        rr1 = vy - np.sqrt(np.abs(g*U[:,:,0]))
+        max1=np.amax(np.real(r))
+        max2=np.amax(np.real(r1))
+        max3=np.amax(np.real(rr))
+        max4=np.amax(np.real(rr1))
+        max5=np.amax(np.real(ux))
+        max6=np.amax(np.real(vy))
+        max_valx0=np.maximum(max1,max2)
+        max_valx=np.maximum(max5,max_valx0)
+        max_valy0=np.maximum(max3,max4)
+        max_valy=np.maximum(max6,max_valy0)
+        print(max_valx)
+        print(max_valy)
+        dt = (.6*dx)/(np.abs(max_valx+max_valy))
                                                                                                              
             
     return U, H0_two, H0, U_euler , U0, V0, H0
@@ -377,14 +397,14 @@ for i in ni:
 
   
    
-    tmax=.05#.01 is good 
-    dt = .3/(i**2)   # much better result than .3
+    tmax=.01#.01 is good 
+    dt = .95/(i**2)   # much better result than .3
     nmax = int(tmax/(dt))
     NN=i
     print (NN)
     x = np.cos(pi*arange(0,NN)/NN); 
     y=x
-    g=.05#9.8  #acceleration due to gravity
+    g=.05  #acceleration due to gravity
     g1=.05
     M=.05
     dx=np.abs(x[1]-x[0])
@@ -392,8 +412,8 @@ for i in ni:
     [xx,yy] = np.meshgrid(x,y)
     U, H0_two, origin, U_euler, U0,V0,H0 = vortex(NN,tmax,nmax,dt,g1,M,g) 
     N[k]= dx # dx
-    error = np.linalg.norm(dx*(np.abs(real(U[:,:,0]) - real(H0_two))), ord=2)
-    error2 = np.linalg.norm(dx*(np.abs(real(U_euler[:,:,0]) - real(H0_two))), ord=2)
+    error = np.linalg.norm(dx*(np.abs(real(U[:,:,0]) - real(H0_two))), ord=np.inf)
+    error2 = np.linalg.norm(dx*(np.abs(real(U_euler[:,:,0]) - real(H0_two))), ord=np.inf)
     linf[k]= error
     linf_euler[k]=error2
     #error = np.linalg.norm(N[k]*(np.abs(real(vvnew1) - real(H0))), ord=1)
@@ -411,24 +431,6 @@ for i in ni:
 #axes.loglog(N, linf, 'bo', label="Actual Leap Frog")
 #axes.legend(loc=4)
 
-#fig = plt.figure()
-#axes = fig.add_subplot(1, 1, 1) 
-#order_C = lambda dx, error, order: np.exp(np.log(error) - order * np.log(dx))
-#axes.loglog(N, order_C(N[0], linf_euler[0], 1.0) * N**1.0, 'b--', label="1st Order")
-#axes.loglog(N, order_C(N[0], linf_euler[0], 2.0) * N**2.0, 'r--', label="2nd Order")     
-#axes.loglog(N, order_C(N[0], linf_euler[0], 4.0) * N**4.0, 'g--', label="4th Order")   
-#axes.loglog(N, linf_euler, 'bo', label="Actual Euler")
-#axes.legend(loc=4)
-
-
-#fig = plt.figure()
-#axes = fig.add_subplot(1, 1, 1) 
-#order_C = lambda dx, error, order: np.exp(np.log(error) - order * np.log(dx))
-#axes.loglog(N, order_C(N[0], linf_euler[0], 1.0) * N**1.0, 'b--', label="1st Order")
-#axes.loglog(N, order_C(N[0], linf_euler[0], 2.0) * N**2.0, 'r--', label="2nd Order")     
-#axes.loglog(N, order_C(N[0], linf_euler[0], 4.0) * N**4.0, 'g--', label="4th Order")   
-#axes.loglog(N, linf_euler, 'bo', label="Actual Euler")
-#axes.legend(loc=4)
 
 
 fig = plt.figure()
@@ -449,12 +451,12 @@ plt.show()
 
 
     
-#fig = plt.figure()
-#axes = fig.add_subplot(1, 1, 1)
-#sol_plot = axes.pcolor(real(U_euler[:,:,0]), cmap=plt.get_cmap('RdBu_r'))
-#cbar = fig.colorbar(sol_plot)  
-#axes.set_title("H computed T = .05 Euler") 
-#plt.show() 
+fig = plt.figure()
+axes = fig.add_subplot(1, 1, 1)
+sol_plot = axes.pcolor(real(U_euler[:,:,0]), cmap=plt.get_cmap('RdBu_r'))
+cbar = fig.colorbar(sol_plot)  
+axes.set_title("H computed T = .05 Euler") 
+plt.show() 
 
 fig = plt.figure()
 axes = fig.add_subplot(1, 1, 1)
@@ -515,16 +517,7 @@ ax.plot_surface(xx,yy,z)
 ax.set_title('3D line plot')
 plt.show()
 
-#fig = plt.figure()
-#ax = Axes3D(fig)
-#z = real(U_euler[:,:,0])
-#y = x
-#ax.plot_surface(xx,yy,z)
-#ax.set_title('3D line plot')
-#plt.show()
 
-error3=np.linalg.norm(np.abs(real(U[:,:,0]) - real(H0_two)), ord=2)
-error4=np.linalg.norm(np.abs(real(U_euler[:,:,0]) - real(H0_two)), ord=2)
 
 print(error3)
 print(error4)
