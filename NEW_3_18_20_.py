@@ -377,23 +377,23 @@ for i in ni:
 
   
    
-    tmax=.002#.01 is good 
+    tmax=.05#.01 is good 
     dt = .3/(i**2)   # much better result than .3
     nmax = int(tmax/(dt))
     NN=i
     print (NN)
     x = np.cos(pi*arange(0,NN)/NN); 
     y=x
-    g=9.8  #acceleration due to gravity
+    g=.05#9.8  #acceleration due to gravity
     g1=.05
     M=.05
     dx=np.abs(x[1]-x[0])
     dy=dx
     [xx,yy] = np.meshgrid(x,y)
     U, H0_two, origin, U_euler, U0,V0,H0 = vortex(NN,tmax,nmax,dt,g1,M,g) 
-    N[k]= dt # dx
-    error = np.linalg.norm(dt*(np.abs(real(U[:,:,0]) - real(H0_two))), ord=2)
-    error2 = np.linalg.norm(dt*(np.abs(real(U_euler[:,:,0]) - real(H0_two))), ord=2)
+    N[k]= dx # dx
+    error = np.linalg.norm(dx*(np.abs(real(U[:,:,0]) - real(H0_two))), ord=2)
+    error2 = np.linalg.norm(dx*(np.abs(real(U_euler[:,:,0]) - real(H0_two))), ord=2)
     linf[k]= error
     linf_euler[k]=error2
     #error = np.linalg.norm(N[k]*(np.abs(real(vvnew1) - real(H0))), ord=1)
@@ -440,7 +440,7 @@ axes.loglog(N, order_C(N[0], linf[0], 1.0) * N**1.0, 'b--', label="1st Order")
 axes.loglog(N, order_C(N[0], linf[0], 2.0) * N**2.0, 'r--', label="2nd Order")     
 axes.loglog(N, linf_euler, 'bs', label="Actual Euler")
 axes.loglog(N, linf, 'rs', label="Leap Frog")
-plt.xlabel('dt')
+plt.xlabel('dx')
 plt.ylabel('error')
 axes.set_title("Chebyshev Differentiation Method from t = %f to t = %f"%(0.0,tmax))
 axes.legend(loc=4)
