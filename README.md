@@ -1,6 +1,7 @@
 # Tsunami
 Tsunami and Storm Surge
 
+The test case is a translating vortex
 
 3_18_spectral_dealiasing_final.py:   is Integrating Factor Method of the shallow water equations
 
