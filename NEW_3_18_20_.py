@@ -380,7 +380,7 @@ def vortex(N,tmax,nmax,dt,g1,M,g):
         max_valy=np.maximum(max6,max_valy0)
         print(max_valx)
         print(max_valy)
-        dt = (.6*dx)/(np.abs(max_valx+max_valy))
+        dt = (.95*dx)/(np.abs(max_valx+max_valy))
                                                                                                              
             
     return U, H0_two, H0, U_euler , U0, V0, H0
@@ -398,7 +398,7 @@ for i in ni:
   
    
     tmax=.01#.01 is good 
-    dt = .95/(i**2)   # much better result than .3
+    dt = 8.0/(i**2)   # much better result than .3
     nmax = int(tmax/(dt))
     NN=i
     print (NN)
@@ -517,7 +517,3 @@ ax.plot_surface(xx,yy,z)
 ax.set_title('3D line plot')
 plt.show()
 
-
-
-print(error3)
-print(error4)
