@@ -46,7 +46,7 @@ def antialiasing(u_hat,v_hat):
     #print (w_hat)
     return w_hat
 
-def convert(U,F,G,N,tmax,t):
+def convert(U,F,G,N,tmax,t,g1,M,g):
     H0 = U[:,:,0]
     U0 = U[:,:,1]/U[:,:,0]
     V0 = U[:,:,2]/U[:,:,0]
@@ -56,7 +56,7 @@ def convert(U,F,G,N,tmax,t):
     y = x
     [xx,yy] = np.meshgrid(x,y)
     
-    g = 9.8
+  
     #U = np.zeros((len(x),len(x),3)) 
     #F = np.zeros((len(x),len(x),3)) 
     #G = np.zeros((len(x),len(x),3)) 
@@ -95,9 +95,8 @@ def convert(U,F,G,N,tmax,t):
     return F,G   
     
     
-def swe(time,N):  
-    M =.05#.08#.1#.5
-    g1 = .05#1.0
+def swe(time,N,g1,M,g):  
+    
     c1=20.0#7.0#.04
     c2=14.0#5.0#.02
     alpha= np.pi/6#-3*np.pi/4 #np.pi
@@ -117,7 +116,7 @@ def swe(time,N):
     F1 = np.zeros((len(x),len(x),3)) 
     G1 = np.zeros((len(x),len(x),3)) 
     ###
-    g = 9.8
+    
     ##
     f = lambda t,xx,yy: -c2*((xx-x_o-M*t*np.cos(alpha))**2+(yy-y_o-M*t*np.sin(alpha))**2)  
     H0 = 1 - (c1**2/(4*c2*g1))*np.exp(2*f(time,xx,yy))
@@ -155,7 +154,7 @@ def swe(time,N):
     return U
       
 
-def vortex(N,tmax,nmax,dt, g1, M):
+def vortex(N,tmax,nmax,dt,g1,M,g):
     
     #t=0
 
@@ -195,7 +194,7 @@ def vortex(N,tmax,nmax,dt, g1, M):
     H0_two = 1 - (c1**2/(4.0*c2*g1))*np.exp(2*f(tmax,xx,yy))
     U0_two = M*np.cos(alpha)+c1*(yy-y_o-M*tmax*np.sin(alpha))*np.exp(f(tmax,xx,yy))
     
-    g = 9.8
+   
     ############
     ############
     U1[:,:,0]=H0
@@ -229,7 +228,7 @@ def vortex(N,tmax,nmax,dt, g1, M):
     vold2temp= M*np.cos(alpha)+c1*(yy-y_o-M*0*np.sin(alpha))*np.exp(f(0,xx,yy))   # U at 0
     vv2temp = M*np.cos(alpha)+c1*(yy-y_o-M*dt1*np.sin(alpha))*np.exp(f(dt1,xx,yy)) # U at dt
     vold2= U[:,:,1]    # HU
-    U22 = swe(dt1,N)
+    U22 = swe(dt1,N,g1,M,g)
     vv2= U22[:,:,1] #np.dot(vold,vold2temp)  # HU at .1
     vold3temp= M*np.sin(alpha)-c1*(xx-x_o-M*0*np.cos(alpha))*np.exp(f(0,xx,yy))   #V
     vv3temp= M*np.sin(alpha)-c1*(xx-x_o-M*dt1*np.cos(alpha))*np.exp(f(dt1,xx,yy)) # V at dt
@@ -359,16 +358,16 @@ def vortex(N,tmax,nmax,dt, g1, M):
         
         U[:,-1,1] =  0#U[0,:,1]
            
-        F,G = convert(U,F,G,N,tmax,t) 
+        F,G = convert(U,F,G,N,tmax,t,g1,M,g) 
         n = n+1
-        dt = (.6*dx)/np.abs(np.max(U[:,:,1]/U[:,:,0])) 
+        dt = (.95*dx)/(np.abs(np.max(U[:,:,1]/U[:,:,0])+np.max(U[:,:,2]/U[:,:,0])))
                                                                                                              
             
     return U, H0_two, H0, U_euler , U0, V0, H0
 
 
 
-ni = [40,60,80,100]
+ni = [40,50,60,70,80]
 #ni = [50]
 linf = np.zeros(5)
 linf_euler = np.zeros(5)
@@ -378,19 +377,20 @@ for i in ni:
 
   
    
-    tmax=.05#.01 is good 
+    tmax=.002#.01 is good 
     dt = .3/(i**2)   # much better result than .3
     nmax = int(tmax/(dt))
     NN=i
     print (NN)
     x = np.cos(pi*arange(0,NN)/NN); 
     y=x
+    g=9.8  #acceleration due to gravity
     g1=.05
     M=.05
     dx=np.abs(x[1]-x[0])
     dy=dx
     [xx,yy] = np.meshgrid(x,y)
-    U, H0_two, origin, U_euler, U0,V0,H0 = vortex(NN,tmax,nmax,dt,g1,M) 
+    U, H0_two, origin, U_euler, U0,V0,H0 = vortex(NN,tmax,nmax,dt,g1,M,g) 
     N[k]= dt # dx
     error = np.linalg.norm(dt*(np.abs(real(U[:,:,0]) - real(H0_two))), ord=2)
     error2 = np.linalg.norm(dt*(np.abs(real(U_euler[:,:,0]) - real(H0_two))), ord=2)
