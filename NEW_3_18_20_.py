@@ -394,8 +394,6 @@ for i in ni:
   
    
     tmax=.01#.01 is good 
-    dt = 8.0/(i**2)   # much better result than .3
-    nmax = int(tmax/(dt))
     NN=i
     print (NN)
     x = np.cos(pi*arange(0,NN)/NN); 
@@ -403,9 +401,44 @@ for i in ni:
     g=.05  #acceleration due to gravity
     g1=.05
     M=.05
+    m = N
+    c1=20.0#7.0#.04
+    c2=14.0#5.0#.02
+    alpha= np.pi/6#-3*np.pi/4 #np.pi
+    x_o=.4#.4#-20 
+    y_o=.2#0.2#-10
     dx=np.abs(x[1]-x[0])
     dy=dx
     [xx,yy] = np.meshgrid(x,y)
+    
+    f = lambda t,xx,yy: -c2*((xx-x_o-M*t*np.cos(alpha))**2+(yy-y_o-M*t*np.sin(alpha))**2)  
+    H0 = 1 - (c1**2/(4*c2*g1))*np.exp(2*f(0,xx,yy))
+    H0_origin = 1 - (c1**2/(4*c2*g1))*np.exp(2*f(0,xx,yy))
+    U0 = M*np.cos(alpha)+c1*(yy-y_o-M*0*np.sin(alpha))*np.exp(f(0,xx,yy))    # 12/8 i changed the tmax to t
+    V0 = M*np.sin(alpha)-c1*(xx-x_o-M*0*np.cos(alpha))*np.exp(f(0,xx,yy))
+    
+    ux=U0
+    vy=V0
+        
+    r = ux + np.sqrt(np.abs(g*H0))
+    r1 = ux - np.sqrt(np.abs(g*H0))
+    rr = vy + np.sqrt(np.abs(g*H0))
+    rr1 = vy - np.sqrt(np.abs(g*H0))
+    max1=np.amax(np.real(r))
+    max2=np.amax(np.real(r1))
+    max3=np.amax(np.real(rr))
+    max4=np.amax(np.real(rr1))
+    max5=np.amax(np.real(ux))
+    max6=np.amax(np.real(vy))
+    max_valx0=np.maximum(max1,max2)
+    max_valx=np.maximum(max5,max_valx0)
+    max_valy0=np.maximum(max3,max4)
+    max_valy=np.maximum(max6,max_valy0)
+    print(max_valx)
+    print(max_valy)
+    dt = (.95*dx)/(np.abs(max_valx+max_valy))
+    nmax = int(tmax/(dt))
+    
     U, H0_two, origin, U_euler, U0,V0,H0 = vortex(NN,tmax,nmax,dt,g1,M,g) 
     N[k]= dx # dx
     error = np.linalg.norm(dx*(np.abs(real(U[:,:,0]) - real(H0_two))), ord=np.inf)
@@ -418,14 +451,6 @@ for i in ni:
 
 
 
-#fig = plt.figure()
-#axes = fig.add_subplot(1, 1, 1) 
-#order_C = lambda dx, error, order: np.exp(np.log(error) - order * np.log(dx))
-#axes.loglog(N, order_C(N[0], linf[0], 1.0) * N**1.0, 'b--', label="1st Order")
-#axes.loglog(N, order_C(N[0], linf[0], 2.0) * N**2.0, 'r--', label="2nd Order")     
-#axes.loglog(N, order_C(N[0], linf[0], 4.0) * N**4.0, 'g--', label="4th Order")   
-#axes.loglog(N, linf, 'bo', label="Actual Leap Frog")
-#axes.legend(loc=4)
 
 
 
