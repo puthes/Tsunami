@@ -11,22 +11,7 @@ from matplotlib.collections import LineCollection
 
 
 
-xx = np.linspace(-1,1,100)
-ff = np.exp(xx)*np.sin(5*xx)
-NN = 10
-t = np.linspace(1,10,10)
 
-x = np.cos((np.pi*(t))/NN)
-f = np.exp(x)*np.sin(5*x)
-
-
-  
-    
-#def chebfft1(v):
- #   N = len(v) - 1
-  #  x = np.cos((t))*np.pi/NN
-   # for ii in range(0, N-1):
-               
                 
 def chebfft(v,x):    #this is the first derivative  1-D
     N = len(v)-1;
@@ -42,26 +27,7 @@ def chebfft(v,x):    #this is the first derivative  1-D
     w[N] = sum((-1)**(iii+1)*ii**2*U[iii])/N + .5*(-1)**(N+1)*N*U[N]
     return w
 
-#N=5
-#L=10
-#aa = 0.34
 
-#x = np.cos(np.pi*np.arange(0,N+1)/N)
-#u=np.sin(2*np.pi*x/L)*np.exp(-aa*x)
-#uder = np.exp(-aa*x)*(2*np.pi*np.cos(2*np.pi*x/L)-aa*L*np.sin(2*np.pi*x/L))/L   #first derivative
-
-#w = chebfft(u,x)   #first derivative using cheb differentiaiton
-#err_ft = w-uder
-
-#print ("L2 norm:",np.linalg.norm(err_ft))
-
-#fig = plt.figure()
-#axes = fig.add_subplot(1, 1, 1)
-    #sol_plot = axes.pcolor(fx_prime_hat, cmap=plt.get_cmap('RdBu_r'))
-#axes.plot(uder,'r')
-#axes.plot(w,'k') 
-#axes.set_title("H actual t= 0") 
-#plt.show()  
 
 
 def antialiasing(u_hat,v_hat):
@@ -91,7 +57,6 @@ def convert(U,F,G,N,tmax,t):
     [xx,yy] = np.meshgrid(x,y)
     
     g = 9.8
-    H0_fft = np.zeros((len(x),len(x)))
     #U = np.zeros((len(x),len(x),3)) 
     #F = np.zeros((len(x),len(x),3)) 
     #G = np.zeros((len(x),len(x),3)) 
@@ -132,7 +97,7 @@ def convert(U,F,G,N,tmax,t):
     
 def swe(time,N):  
     M =.05#.08#.1#.5
-    g = .05#1.0
+    g1 = .05#1.0
     c1=20.0#7.0#.04
     c2=14.0#5.0#.02
     alpha= np.pi/6#-3*np.pi/4 #np.pi
@@ -152,17 +117,10 @@ def swe(time,N):
     F1 = np.zeros((len(x),len(x),3)) 
     G1 = np.zeros((len(x),len(x),3)) 
     ###
-    H2 = np.zeros((len(x),len(x)))
-    HU = np.zeros((len(x),len(x)))
-    HV = np.zeros((len(x),len(x)))
-    V2 = np.zeros((len(x),len(x)))
-    HUU = np.zeros((len(x),len(x)))
-    HUV = np.zeros((len(x),len(x)))
-    HVV = np.zeros((len(x),len(x)))
-    H0_fft = np.zeros((len(x),len(x)))
+    g = 9.8
     ##
     f = lambda t,xx,yy: -c2*((xx-x_o-M*t*np.cos(alpha))**2+(yy-y_o-M*t*np.sin(alpha))**2)  
-    H0 = 1 - (c1**2/(4*c2*g))*np.exp(2*f(time,xx,yy))
+    H0 = 1 - (c1**2/(4*c2*g1))*np.exp(2*f(time,xx,yy))
     U0 = M*np.cos(alpha)+c1*(yy-y_o-M*time*np.sin(alpha))*np.exp(f(time,xx,yy))    # 12/8 i changed the tmax to t
     V0 = M*np.sin(alpha)-c1*(xx-x_o-M*time*np.cos(alpha))*np.exp(f(time,xx,yy))
    
@@ -197,7 +155,7 @@ def swe(time,N):
     return U
       
 
-def vortex(N,tmax,nmax,dt, g, M):
+def vortex(N,tmax,nmax,dt, g1, M):
     
     #t=0
 
@@ -206,9 +164,7 @@ def vortex(N,tmax,nmax,dt, g, M):
     dt1=dt
     
     m = N
-    #dt = .4*tmax/(N-1)
-    #M =1.9#.1#.08#.1#.5
-    #g =9.9# 9.0#1.0
+  
     c1=20.0#7.0#.04
     c2=14.0#5.0#.02
     alpha= np.pi/6#-3*np.pi/4 #np.pi
@@ -228,25 +184,18 @@ def vortex(N,tmax,nmax,dt, g, M):
     F1 = np.zeros((len(x),len(x),3)) 
     G1 = np.zeros((len(x),len(x),3)) 
     ###
-    H2 = np.zeros((len(x),len(x)))
-    HU = np.zeros((len(x),len(x)))
-    HV = np.zeros((len(x),len(x)))
-    V2 = np.zeros((len(x),len(x)))
-    HUU = np.zeros((len(x),len(x)))
-    HUV = np.zeros((len(x),len(x)))
-    HVV = np.zeros((len(x),len(x)))
-    H0_fft = np.zeros((len(x),len(x)))
+
     ##
     f = lambda t,xx,yy: -c2*((xx-x_o-M*t*np.cos(alpha))**2+(yy-y_o-M*t*np.sin(alpha))**2)  
-    H0 = 1 - (c1**2/(4*c2*g))*np.exp(2*f(0,xx,yy))
-    H0_origin = 1 - (c1**2/(4*c2*g))*np.exp(2*f(0,xx,yy))
+    H0 = 1 - (c1**2/(4*c2*g1))*np.exp(2*f(0,xx,yy))
+    H0_origin = 1 - (c1**2/(4*c2*g1))*np.exp(2*f(0,xx,yy))
     U0 = M*np.cos(alpha)+c1*(yy-y_o-M*0*np.sin(alpha))*np.exp(f(0,xx,yy))    # 12/8 i changed the tmax to t
     V0 = M*np.sin(alpha)-c1*(xx-x_o-M*0*np.cos(alpha))*np.exp(f(0,xx,yy))
     V0_two = M*np.sin(alpha)-c1*(xx-x_o-M*tmax*np.cos(alpha))*np.exp(f(tmax,xx,yy))
-    H0_two = 1 - (c1**2/(4.0*c2*g))*np.exp(2*f(tmax,xx,yy))
+    H0_two = 1 - (c1**2/(4.0*c2*g1))*np.exp(2*f(tmax,xx,yy))
     U0_two = M*np.cos(alpha)+c1*(yy-y_o-M*tmax*np.sin(alpha))*np.exp(f(tmax,xx,yy))
     
-    
+    g = 9.8
     ############
     ############
     U1[:,:,0]=H0
@@ -275,8 +224,8 @@ def vortex(N,tmax,nmax,dt, g, M):
     ###############
     
      
-    vold=1 - (c1**2/(4*c2*g))*np.exp(2*f(0,xx,yy))  #H
-    vv=1 - (c1**2/(4*c2*g))*np.exp(2*f(dt1,xx,yy))  #H at dt
+    vold=1 - (c1**2/(4*c2*g1))*np.exp(2*f(0,xx,yy))  #H
+    vv=1 - (c1**2/(4*c2*g1))*np.exp(2*f(dt1,xx,yy))  #H at dt
     vold2temp= M*np.cos(alpha)+c1*(yy-y_o-M*0*np.sin(alpha))*np.exp(f(0,xx,yy))   # U at 0
     vv2temp = M*np.cos(alpha)+c1*(yy-y_o-M*dt1*np.sin(alpha))*np.exp(f(dt1,xx,yy)) # U at dt
     vold2= U[:,:,1]    # HU
@@ -309,11 +258,13 @@ def vortex(N,tmax,nmax,dt, g, M):
   #  U[:,0,1] = 0#  U[-1,:,1]
         
    # U[:,-1,1] =  0#U[0,:,1]
-  
-    for n in range(1,nmax+1):
+    n=0
+    t=0
+    while (t <tmax):
         t = n*dt
         print ("t=")
         print (t)
+        print ("n=")
         print (n)
         print (N)
         #
@@ -337,7 +288,7 @@ def vortex(N,tmax,nmax,dt, g, M):
             #F,G = convert(U,F,G,N,tmax,t) 
             
             x = np.cos((pi*arange(0,N))/N); 
-            dx=x[1]-x[0]
+            dx=np.abs(x[0]-x[1])
                
               
             ux0=chebfft(F[k,:,0], x)
@@ -355,7 +306,7 @@ def vortex(N,tmax,nmax,dt, g, M):
 
             
             #dt= (dx * .5)/max5
-            t = n*dt
+          
             
             ux1=chebfft(F[k,:,1], x)
             uy1=chebfft(G[:,k,1], x)
@@ -408,7 +359,9 @@ def vortex(N,tmax,nmax,dt, g, M):
         
         U[:,-1,1] =  0#U[0,:,1]
            
-        F,G = convert(U,F,G,N,tmax,t)  
+        F,G = convert(U,F,G,N,tmax,t) 
+        n = n+1
+        dt = (.6*dx)/np.abs(np.max(U[:,:,1]/U[:,:,0])) 
                                                                                                              
             
     return U, H0_two, H0, U_euler , U0, V0, H0
@@ -417,27 +370,27 @@ def vortex(N,tmax,nmax,dt, g, M):
 
 ni = [40,60,80,100]
 #ni = [50]
-linf = np.zeros(4)
-linf_euler = np.zeros(4)
-N= np.zeros(4)
+linf = np.zeros(5)
+linf_euler = np.zeros(5)
+N= np.zeros(5)
 k=0
 for i in ni:
 
   
    
-    tmax=.001#.01 is good 
+    tmax=.05#.01 is good 
     dt = .3/(i**2)   # much better result than .3
     nmax = int(tmax/(dt))
     NN=i
     print (NN)
     x = np.cos(pi*arange(0,NN)/NN); 
     y=x
-    g=.05
+    g1=.05
     M=.05
     dx=np.abs(x[1]-x[0])
     dy=dx
     [xx,yy] = np.meshgrid(x,y)
-    U, H0_two, origin, U_euler, U0,V0,H0 = vortex(NN,tmax,nmax,dt,g,M) 
+    U, H0_two, origin, U_euler, U0,V0,H0 = vortex(NN,tmax,nmax,dt,g1,M) 
     N[k]= dt # dx
     error = np.linalg.norm(dt*(np.abs(real(U[:,:,0]) - real(H0_two))), ord=2)
     error2 = np.linalg.norm(dt*(np.abs(real(U_euler[:,:,0]) - real(H0_two))), ord=2)
