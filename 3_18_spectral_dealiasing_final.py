@@ -124,8 +124,7 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time):
         subdd=real(np.fft.ifft2( subd       ))
         d = g * np.fft.fft2(matrix_antialiasing(subdd,subdd))
         v1 = E2*v1 + (E2*a + 2*E*(b+c) + d)/6
-        #v1 = matrix_antialiasing(E2,v1) + (matrix_antialiasing(E2,a) + matrix_antialiasing(2*E,(b+c)) + d)/6
-    #if n%nplt == 0:
+        
         h1 = real(np.fft.ifft2(v1))
     ######################
         g = ik3*dt
@@ -144,12 +143,7 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time):
         v2 = E2*v2 + (E2*a + 2*E*(b+c) + d)/6
   
         h2 = real(np.fft.ifft2(v2))
-        #Cmax=.9
-        #dt=(Cmax*dx)/np.max(h1/h)
-    
-    #V0=h2/h
-    #U0=h1/h
-        
+       
     
         U[:,:,0]=h
         U[:,:,1]=h1
@@ -174,13 +168,12 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time):
         
         
     return U
-        #U0=np.fft.fft2(U0)
-    #V0=np.fft.fft2(V0)
+     
 
 #ni=[50,100,150,200,250]
-ni=[40,50,60,70,80]#,90,100]
-linf=np.zeros(5)
-NN=np.zeros(5)
+ni=[40,46,52,58,64,70,76,82]#,90,100]
+linf=np.zeros(8)
+NN=np.zeros(8)
 
 for i in range(0,len(ni)):
     N=ni[i]
@@ -216,7 +209,7 @@ for i in range(0,len(ni)):
     U0_max = M*np.cos(alpha)+c1*(yy-y_o-M*tmax*np.sin(alpha))*np.exp(f(tmax,xx,yy))    # 12/8 i changed the tmax to t
     V0_max = M*np.sin(alpha)-c1*(xx-x_o-M*tmax*np.cos(alpha))*np.exp(f(tmax,xx,yy))   
     U=spectral_del(nmax,dt, N, H0,U0,V0,time)
-    linf[i]=np.linalg.norm(dt*np.abs((real(U[:,:,0]) - real(H0_max))), ord=2)
+    linf[i]=np.linalg.norm(dt*np.abs((real(U[:,:,0]) - real(H0_max))), ord=np.inf)
     NN[i]=dt
     
 fig = plt.figure()
@@ -243,13 +236,7 @@ ax.plot_surface(xx,yy,z)
 ax.set_title('3D line plot')
 plt.show()
 
-
-    
-#fig0, ax0 = plt.subplots()
-#strm = ax0.streamplot(xx, yy, U0, V0, color=U0, linewidth=2, cmap=plt.cm.autumn)
-#fig0.colorbar(strm.lines)
-#ax0.set_title('Actual at t=1.0')
-#plt.show()   
+ 
       
             
 U1=U[:,:,1]/U[:,:,0]
