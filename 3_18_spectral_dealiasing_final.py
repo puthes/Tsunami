@@ -168,7 +168,7 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time):
      
 
 #ni=[50,100,150,200,250]
-ni=[52,58,64,70,76,82]#,90,100]
+ni=[40,46,52,58,64,70]#,90,100]
 linf=np.zeros(6)
 NN=np.zeros(6)
 
@@ -177,11 +177,11 @@ for i in range(0,len(ni)):
 
     ######################################################################################lin
     time=1.0
-    dt=.8/N**2
+    dt=3.0/N**2
     #nmax=18#int(tmax/dt)
-    t1 = .0027#.00144#nmax*dt
+    t1 = .01#.00144#nmax*dt
     tmax = time + t1
-    nmax=1#int(round(t1/dt))  
+    nmax=int(round(t1/dt))  
     print (nmax)
    
     M =.9#.1#.5
@@ -206,7 +206,7 @@ for i in range(0,len(ni)):
     U0_max = M*np.cos(alpha)+c1*(yy-y_o-M*tmax*np.sin(alpha))*np.exp(f(tmax,xx,yy))    # 12/8 i changed the tmax to t
     V0_max = M*np.sin(alpha)-c1*(xx-x_o-M*tmax*np.cos(alpha))*np.exp(f(tmax,xx,yy))   
     U=spectral_del(nmax,dt, N, H0,U0,V0,time)
-    linf[i]=np.linalg.norm(dt*np.abs((real(U[:,:,0]) - real(H0_max))), ord=2)
+    linf[i]=np.linalg.norm(dt*np.abs((real(U[:,:,0]) - real(H0_max))), ord=np.inf)
     NN[i]=dt
     
 fig = plt.figure()
