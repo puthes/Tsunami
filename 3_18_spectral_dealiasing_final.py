@@ -87,9 +87,7 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time):
     #U[:,-1,2] =  0#U[0,:,1] 
     U[-1,:,2] =  0#U[0,:,1] 
     
-         
-    
-
+ 
     for n in range(1,nmax+1):
         v = np.fft.fft2(U[:,:,0])
         v1 = np.fft.fft2(U[:,:,1])
@@ -103,8 +101,8 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time):
         b = g * matrix_antialiasing(sub1,sub1) 
         sub2=E*(v+b/2) 
         c = g * matrix_antialiasing(sub2,sub2) 
-        sub3=matrix_antialiasing(E2,v)
-        sub4=matrix_antialiasing(E,c) 
+        sub3=E2*v#matrix_antialiasing(E2,v)
+        sub4=E*c#matrix_antialiasing(E,c) 
         d = g * matrix_antialiasing(sub3+sub4,sub3+sub3) 
         v = E2*v + (E2*a + 2*E*(b+c) + d)/6
     
@@ -143,8 +141,7 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time):
         v2 = E2*v2 + (E2*a + 2*E*(b+c) + d)/6
   
         h2 = real(np.fft.ifft2(v2))
-       
-    
+        
         U[:,:,0]=h
         U[:,:,1]=h1
         U[:,:,2]=h2
@@ -171,9 +168,9 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time):
      
 
 #ni=[50,100,150,200,250]
-ni=[40,46,52,58,64,70,76,82]#,90,100]
-linf=np.zeros(8)
-NN=np.zeros(8)
+ni=[52,58,64,70,76,82]#,90,100]
+linf=np.zeros(6)
+NN=np.zeros(6)
 
 for i in range(0,len(ni)):
     N=ni[i]
@@ -184,7 +181,7 @@ for i in range(0,len(ni)):
     #nmax=18#int(tmax/dt)
     t1 = .0027#.00144#nmax*dt
     tmax = time + t1
-    nmax=int(round(t1/dt))  
+    nmax=1#int(round(t1/dt))  
     print (nmax)
    
     M =.9#.1#.5
@@ -209,7 +206,7 @@ for i in range(0,len(ni)):
     U0_max = M*np.cos(alpha)+c1*(yy-y_o-M*tmax*np.sin(alpha))*np.exp(f(tmax,xx,yy))    # 12/8 i changed the tmax to t
     V0_max = M*np.sin(alpha)-c1*(xx-x_o-M*tmax*np.cos(alpha))*np.exp(f(tmax,xx,yy))   
     U=spectral_del(nmax,dt, N, H0,U0,V0,time)
-    linf[i]=np.linalg.norm(dt*np.abs((real(U[:,:,0]) - real(H0_max))), ord=np.inf)
+    linf[i]=np.linalg.norm(dt*np.abs((real(U[:,:,0]) - real(H0_max))), ord=2)
     NN[i]=dt
     
 fig = plt.figure()
