@@ -383,7 +383,7 @@ def vortex(N,tmax,nmax,dt,g1,M,g):
 
 
 
-ni = [40,50,60,70,80,100]
+ni = [20,30,40,50,60,70]
 #ni = [50]
 linf = np.zeros(6)
 linf_euler = np.zeros(6)
@@ -393,7 +393,7 @@ for i in ni:
 
   
    
-    tmax=.01#.01 is good 
+    tmax=.02#.01 is good 
     NN=i
     print (NN)
     x = np.cos(pi*arange(0,NN)/NN); 
