@@ -383,8 +383,8 @@ def vortex(N,tmax,nmax,dt,g1,M,g):
 
 
 
-ni = [20,30,40,50,60,70]
-#ni = [50]
+#ni = [20,30,40,50,60,70]
+ni = [15,20,25,30,35,40]
 linf = np.zeros(6)
 linf_euler = np.zeros(6)
 N= np.zeros(6)
