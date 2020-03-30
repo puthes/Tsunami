@@ -24,10 +24,11 @@ def antialiasing(u_hat,v_hat):
     return w_hat
     
 def matrix_antialiasing(h,m):
-    
+   
     r = np.zeros((len(m),len(m))) 
     for i in range(0,len(m)): 
         r_temp= antialiasing(h[i,:],m[i,:])    
+        
         r[i,:]= r_temp    
                 
     return r      
@@ -61,7 +62,9 @@ def matrix_antialiasing(h,m):
 
 def spectral_del(nmax,dt, N, H0,U0,V0,time,tmax):
     k = zeros(N)
-    k[0:int(N/2)] = arange(0,int(N/2)); k[int(N/2)+1:] = arange(int(-N/2)+1,0,1)
+    k[0:int(N/2)] = arange(0,int(N/2))
+    k[int(N/2)+1:] = arange(int(-N/2)+1,0,1)
+    #print(k)
 
     ik1 = 1j*k # 1j*k**3
     ik2 = 1j*k# 1j*k**3
@@ -147,8 +150,16 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time,tmax):
         U[:,:,1]=h1
         U[:,:,2]=h2
         
+        ux=U[:,:,1]/U[:,:,0]
+        vy=U[:,:,2]/U[:,:,0]
         
+        ux=np.amax(ux)
+        vy=np.amax(vy)
+        print(ux)
+        print(vy)
         #U[0,:,1] = 0#  U[-1,:,1]
+        
+        #dt = (.95*dx)/(np.abs(ux+vy))
        
         print("t=")
         print(t)
@@ -158,7 +169,7 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time,tmax):
         print("dt=")
         print(dt)
         n=n+1
-        
+        print(n)
         
         #U[:,0,1] =  0#U[0,:,1]
         #U[:,-1,1] =  0#U[0,:,1] 
@@ -179,21 +190,22 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time,tmax):
     return U
      
 
-#ni=[80]
-ni=[30,40,50,60,70]#,90,100]
-linf=np.zeros(5)
-NN=np.zeros(5)
+
+ni=[100,120,140,160,180,200]
+#ni=[160]
+linf=np.zeros(6)
+NN=np.zeros(6)
 
 for i in range(0,len(ni)):
     N=ni[i]
 
     ######################################################################################lin
     time=0.0
-    dt=.7/N**2
+    dt=8.0/N**2  #5.0 is the best
     #nmax=18#int(tmax/dt)
-    t1 = .01#.00144#nmax*dt
+    t1 = .01#.005#.00144#nmax*dt
     tmax = time + t1
-    nmax=int(round(t1/dt))  
+    nmax= int(round(t1/dt))  
     print (nmax)
    
     M =.9#.1#.5
@@ -204,7 +216,7 @@ for i in range(0,len(ni)):
     x_o=-2.0#20.4#-20 
     y_o=-1.0#10.2#-10
     
-    x = (2*pi/N)*arange(-N/2,N/2)#
+    x = (2*pi/N)*np.linspace(-N/2,N/2,N)#
 #np.cos((pi*arange(0,N))/N); 
     dx=np.abs(x[1]-x[0])
     dy=dx
@@ -265,6 +277,12 @@ fig0, ax0 = plt.subplots()
 strm = ax0.streamplot(xx, yy, U0_max, V0_max, color=U0, linewidth=2, cmap=plt.cm.autumn)
 fig0.colorbar(strm.lines)
 ax0.set_title("Actual Streamlines at t = %f"%(tmax))
+plt.show()
+
+fig0, ax0 = plt.subplots()
+strm = ax0.streamplot(xx, yy, U0, V0, color=U0, linewidth=2, cmap=plt.cm.autumn)
+fig0.colorbar(strm.lines)
+ax0.set_title("Actual Streamlines at t = 0")
 plt.show()
 
 fig = plt.figure()
