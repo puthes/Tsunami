@@ -163,20 +163,7 @@ def vortex(N,tmax,nmax,dt,g1,M,g,U0,V0,H0):
     
       # on hu
          
-    U[0,:,2] = 0#  U[-1,:,1]
-        
-    U[-1,:,2] =  0#U[0,:,1]
-  #  U[:,0,2] = 0#  U[-1,:,1]
-        
-   # U[:,-1,2] =  0#U[0,:,1]
-           
-           
-       
-        # on hu
-           
-    U[:,0,1] =  0#U[-1,:,2]
-    U[:,-1,1] = 0# U[0,:,2
-  #  U[:,0,1] = 0#  U[-1,:,1]
+    
         
    # U[:,-1,1] =  0#U[0,:,1]
     n=0
@@ -266,6 +253,15 @@ def vortex(N,tmax,nmax,dt,g1,M,g,U0,V0,H0):
             ax.plot_surface(xx,yy,z)
             ax.set_title("t = %f"%(t))
             plt.show()
+        if t==.01:
+            fig = plt.figure()
+            ax = Axes3D(fig)
+            z = real(U[:,:,0])
+            y = x
+            ax.plot_surface(xx,yy,z)
+            ax.set_title("t = %f"%(t))
+            plt.show()
+     
         if t==.05:
             fig = plt.figure()
             ax = Axes3D(fig)
@@ -274,23 +270,7 @@ def vortex(N,tmax,nmax,dt,g1,M,g,U0,V0,H0):
             ax.plot_surface(xx,yy,z)
             ax.set_title("t = %f"%(t))
             plt.show()
-        if t==.5:
-            fig = plt.figure()
-            ax = Axes3D(fig)
-            z = real(U[:,:,0])
-            y = x
-            ax.plot_surface(xx,yy,z)
-            ax.set_title("t = %f"%(t))
-            plt.show()
-        if t==1.0:
-            fig = plt.figure()
-            ax = Axes3D(fig)
-            z = real(U[:,:,0])
-            y = x
-            ax.plot_surface(xx,yy,z)
-            ax.set_title("t = %f"%(t))
-            plt.show()
-        if t==1.3:
+        if t==.09:
             fig = plt.figure()
             ax = Axes3D(fig)
             z = real(U[:,:,0])
@@ -298,7 +278,7 @@ def vortex(N,tmax,nmax,dt,g1,M,g,U0,V0,H0):
             ax.plot_surface(xx,yy,z)
             ax.set_title("t = %f"%(t))
             plt.show() 
-        if t==1.35:
+        if t==.1:
             fig = plt.figure()
             ax = Axes3D(fig)
             z = real(U[:,:,0])
@@ -306,7 +286,7 @@ def vortex(N,tmax,nmax,dt,g1,M,g,U0,V0,H0):
             ax.plot_surface(xx,yy,z)
             ax.set_title("t = %f"%(t))
             plt.show()
-        if t==1.4:
+        if t==.11:
             fig = plt.figure()
             ax = Axes3D(fig)
             z = real(U[:,:,0])
@@ -314,7 +294,7 @@ def vortex(N,tmax,nmax,dt,g1,M,g,U0,V0,H0):
             ax.plot_surface(xx,yy,z)
             ax.set_title("t = %f"%(t))
             plt.show()   
-        if t==1.45:
+        if t==.12:
             fig = plt.figure()
             ax = Axes3D(fig)
             z = real(U[:,:,0])
@@ -322,7 +302,7 @@ def vortex(N,tmax,nmax,dt,g1,M,g,U0,V0,H0):
             ax.plot_surface(xx,yy,z)
             ax.set_title("t = %f"%(t))
             plt.show() 
-        if t==1.5:
+        if t==.13:
             fig = plt.figure()
             ax = Axes3D(fig)
             z = real(U[:,:,0])
@@ -330,15 +310,7 @@ def vortex(N,tmax,nmax,dt,g1,M,g,U0,V0,H0):
             ax.plot_surface(xx,yy,z)
             ax.set_title("t = %f"%(t))
             plt.show()
-        if t==1.55:
-            fig = plt.figure()
-            ax = Axes3D(fig)
-            z = real(U[:,:,0])
-            y = x
-            ax.plot_surface(xx,yy,z)
-            ax.set_title("t = %f"%(t))
-            plt.show()                   
-                                      
+                       
            
         F,G = convert(U,F,G,N,tmax,t,g1,M,g) 
         n = n+1
@@ -349,24 +321,7 @@ def vortex(N,tmax,nmax,dt,g1,M,g,U0,V0,H0):
           # on hu
           
            
-        U[0,:,2] = 0#  U[-1,:,1]
-        U[1,:,2] = 0
-        U[-1,:,2] =  0#U[0,:,1]
-        U[-2,:,2] = 0
-        U[:,0,2] = 0#  U[-1,:,1]
-        U[:,1,2] = 0
-        U[:,-1,2] =  0#U[0,:,1]
-        U[:,-2,2] = 0
-        # on hu
-           
-        U[0,:,1] = 0#  U[-1,:,1]
-        U[1,:,1] = 0
-        U[-1,:,1] =  0#U[0,:,1]
-        U[-2,:,1] = 0
-        U[:,0,1] = 0#  U[-1,:,1]
-        U[:,1,1] = 0
-        U[:,-1,1] =  0#U[0,:,1]
-        U[:,-2,1] = 0
+        
                                                                                                              
             
     return U,U_euler 
@@ -380,12 +335,12 @@ linf_euler = np.zeros(1)
 N= np.zeros(1)
 k=0
 
-tmax=1.55#.01#.01 is good 
-NN=100
+tmax=.13#1.55#.01#.01 is good 
+NN=256
 print (NN)
 x = np.cos(pi*arange(0,NN)/NN); 
 y=x
-g=1.5  #acceleration due to gravity
+g=9.8  #acceleration due to gravity
 g1=.5
 M=.08
 m = NN
@@ -398,11 +353,23 @@ dy=dx
 
 def gauss_swe(sig,NN):
         
-        x = np.linspace(-sig*1.5,sig*1.5,NN+1)
-        dist = np.diff(st.norm.cdf(x))
-        gauss = np.outer(dist, dist)
-        gauss2 = gauss/gauss.sum()
-        return gauss2
+    
+        x = np.cos(pi*arange(0,NN)/NN); 
+        dx=np.abs(x[1]-x[0])
+        dy=dx
+        y = x
+        M =.08#
+        g =-50.0#.
+        c1=200.0
+        c2=100.0
+        alpha= 4*np.pi
+        x_o=.5#
+        y_o=.2#
+        [xx,yy] = np.meshgrid(x,y)
+        f = lambda t,xx,yy: -c2*((xx-x_o-M*t*np.cos(alpha))**2+(yy-y_o-M*t*np.sin(alpha))**2)  
+        H0 = 1 - (c1**2/(4*c2*g))*np.exp(2*f(0.0,xx,yy))
+       
+        return H0
     
 
 H0 = gauss_swe(15,NN)
@@ -424,34 +391,6 @@ k = k + 1
 
 
 
-
-
-
-
-    
-fig = plt.figure()
-axes = fig.add_subplot(1, 1, 1)
-sol_plot = axes.pcolor(H0, cmap=plt.get_cmap('RdBu_r'))
-cbar = fig.colorbar(sol_plot)  
-axes.set_title("H") 
-plt.show() 
-
-fig = plt.figure()
-axes = fig.add_subplot(1, 1, 1)
-sol_plot = axes.pcolor(real(U[:,:,0]), cmap=plt.get_cmap('RdBu_r'))
-cbar = fig.colorbar(sol_plot)  
-axes.set_title("H computed T = .005") 
-plt.show() 
-
-
-
-fig = plt.figure()
-ax = Axes3D(fig)
-z = real(H0)
-y = x
-ax.plot_surface(xx,yy,z)
-ax.set_title('3D line plot')
-plt.show()
 
 fig = plt.figure()
 ax = Axes3D(fig)
