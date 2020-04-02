@@ -145,17 +145,17 @@ def vortex(N,tmax,nmax,dt,g1,M,g,U0,V0,H0):
     ###############
     
      
-    vold=U0  #H
+    vold=H0#np.zeros((len(x),len(x)))#U0  #H
     vv=H0  #H at dt
     vold2temp= U0  # U at 0
     vv2temp = U0 # U at dt
-    vold2=U0    # HU
+    vold2=U0*H0    # HU
   
-    vv2= U0 #np.dot(vold,vold2temp)  # HU at .1
-    vold3temp= U0   #V
+    vv2= U0*H0 #np.dot(vold,vold2temp)  # HU at .1
+    vold3temp= V0   #V
     vv3temp= V0 # V at dt
-    vold3= U0  # HV
-    vv3=U0#HV at .1
+    vold3= H0*V0  # HV
+    vv3=H0*V0#HV at .1
     
     vv_euler=vv    
     vv2_euler=vv2
@@ -270,14 +270,7 @@ def vortex(N,tmax,nmax,dt,g1,M,g,U0,V0,H0):
             ax.plot_surface(xx,yy,z)
             ax.set_title("t = %f"%(t))
             plt.show()
-        if t==.09:
-            fig = plt.figure()
-            ax = Axes3D(fig)
-            z = real(U[:,:,0])
-            y = x
-            ax.plot_surface(xx,yy,z)
-            ax.set_title("t = %f"%(t))
-            plt.show() 
+       
         if t==.1:
             fig = plt.figure()
             ax = Axes3D(fig)
@@ -286,14 +279,7 @@ def vortex(N,tmax,nmax,dt,g1,M,g,U0,V0,H0):
             ax.plot_surface(xx,yy,z)
             ax.set_title("t = %f"%(t))
             plt.show()
-        if t==.11:
-            fig = plt.figure()
-            ax = Axes3D(fig)
-            z = real(U[:,:,0])
-            y = x
-            ax.plot_surface(xx,yy,z)
-            ax.set_title("t = %f"%(t))
-            plt.show()   
+           
         if t==.12:
             fig = plt.figure()
             ax = Axes3D(fig)
@@ -310,6 +296,23 @@ def vortex(N,tmax,nmax,dt,g1,M,g,U0,V0,H0):
             ax.plot_surface(xx,yy,z)
             ax.set_title("t = %f"%(t))
             plt.show()
+        if t==.14:
+            fig = plt.figure()
+            ax = Axes3D(fig)
+            z = real(U[:,:,0])
+            y = x
+            ax.plot_surface(xx,yy,z)
+            ax.set_title("t = %f"%(t))
+            plt.show()    
+        if t==.15:
+            fig = plt.figure()
+            ax = Axes3D(fig)
+            z = real(U[:,:,0])
+            y = x
+            ax.plot_surface(xx,yy,z)
+            ax.set_title("t = %f"%(t))
+            plt.show()  
+           
                        
            
         F,G = convert(U,F,G,N,tmax,t,g1,M,g) 
@@ -335,7 +338,7 @@ linf_euler = np.zeros(1)
 N= np.zeros(1)
 k=0
 
-tmax=.13#1.55#.01#.01 is good 
+tmax=.16
 NN=256
 print (NN)
 x = np.cos(pi*arange(0,NN)/NN); 
