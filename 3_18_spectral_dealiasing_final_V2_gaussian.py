@@ -8,8 +8,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
 import scipy.stats as st
+import seaborn as sns
 from scipy import signal
-
+sns.set(font_scale=1.6)
 
 def antialiasing(u_hat,v_hat):
     N = len(u_hat)
@@ -93,16 +94,16 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time,tmax):
         g = ik2*dt
         E = np.exp(-dt*ik2*V0); E2 = matrix_antialiasing(E,E)
         suba=real(np.fft.ifft2( v1         ))
-        a = g * np.fft.fft2(matrix_antialiasing(suba,suba))
+        a = g * np.fft.fft2(matrix_antialiasing(suba,suba)/h)
         subb=matrix_antialiasing(E,(v1+a/2))
         subbb=real(np.fft.ifft2( subb       ))
-        b = g * np.fft.fft2(matrix_antialiasing(subbb,subbb))
+        b = g * np.fft.fft2(matrix_antialiasing(subbb,subbb)/h)
         suzz=matrix_antialiasing(E,(v1+b/2))
         suzzz=real(np.fft.ifft2( suzz       ))
-        c = g * np.fft.fft2(matrix_antialiasing(suzzz,suzzz))
+        c = g * np.fft.fft2(matrix_antialiasing(suzzz,suzzz)/h)
         subd=matrix_antialiasing(E2,v1)+matrix_antialiasing(E,c)#E2*v1+E*c
         subdd=real(np.fft.ifft2( subd       ))
-        d = g * np.fft.fft2(matrix_antialiasing(subdd,subdd))
+        d = g * np.fft.fft2(matrix_antialiasing(subdd,subdd)/h)
         v1 = E2*v1 + (E2*a + 2*E*(b+c) + d)/6
         
         h1 = real(np.fft.ifft2(v1))
@@ -110,17 +111,16 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time,tmax):
         g = ik3*dt
         E = np.exp(-dt*ik3*U0); E2 = matrix_antialiasing(E,E)
         suba=real(np.fft.ifft2( v2         ))
-        a = g * np.fft.fft2(matrix_antialiasing(suba,suba))
+        a = g * np.fft.fft2(matrix_antialiasing(suba,suba)/h)
         subb=matrix_antialiasing(E,(v2+a/2))
         subbb=real(np.fft.ifft2( subb       ))
-        b = g * np.fft.fft2(matrix_antialiasing(subbb,subbb))
+        b = g * np.fft.fft2(matrix_antialiasing(subbb,subbb)/h)
         suzz=matrix_antialiasing(E,(v2+b/2))
         suzzz=real(np.fft.ifft2( suzz       ))
-        c = g * np.fft.fft2(matrix_antialiasing(suzzz,suzzz))
+        c = g * np.fft.fft2(matrix_antialiasing(suzzz,suzzz)/h)
         subd=matrix_antialiasing(E2,v2)+matrix_antialiasing(E,c)#E2*v1+E*c
         subdd=real(np.fft.ifft2( subd       ))
-        d = g * np.fft.fft2(matrix_antialiasing(subdd,subdd))
-        
+        d = g * np.fft.fft2(matrix_antialiasing(subdd,subdd)/h)
         v2 = E2*v2 + (E2*a + 2*E*(b+c) + d)/6
   
         h2 = real(np.fft.ifft2(v2))
@@ -161,19 +161,9 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time,tmax):
             ax.set_zlim(-.05, .2)
             ax.set_title("t = %f"%(t))
             plt.show()   
-        
-              
-        if t==.0016:
-            fig = plt.figure()
-            ax = Axes3D(fig)
-            z = real(U[:,:,0])
-            y = x
-            ax.plot_surface(xx,yy,z)
-            ax.set_zlim(-.05, .2)
-            ax.set_title("t = %f"%(t))
-            plt.show()   
+
        
-        if t==.004:
+        if t==dt*20:
             fig = plt.figure()
             ax = Axes3D(fig)
             z = real(U[:,:,0])
@@ -182,9 +172,9 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time,tmax):
             ax.set_zlim(-.05, .2)
             ax.set_title("t = %f"%(t))
             plt.show()     
-            
+      
        
-        if t==.0056:
+        if t==dt*40:
             fig = plt.figure()
             ax = Axes3D(fig)
             z = real(U[:,:,0])
@@ -194,7 +184,7 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time,tmax):
             ax.set_title("t = %f"%(t))
             plt.show()           
     
-        if t==.012:
+        if t==dt*60:
             fig = plt.figure()
             ax = Axes3D(fig)
             z = real(U[:,:,0])
@@ -203,13 +193,43 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time,tmax):
             ax.set_zlim(-.05, .2)
             ax.set_title("t = %f"%(t))
             plt.show() 
+            
+        if t==dt*100:
+            fig = plt.figure()
+            ax = Axes3D(fig)
+            z = real(U[:,:,0])
+            y = x
+            ax.plot_surface(xx,yy,z)
+            ax.set_zlim(-.05, .2)
+            ax.set_title("t = %f"%(t))
+            plt.show() 
+      
+        if t==dt*180:
+            fig = plt.figure()
+            ax = Axes3D(fig)
+            z = real(U[:,:,0])
+            y = x
+            ax.plot_surface(xx,yy,z)
+            ax.set_zlim(-.05, .2)
+            ax.set_title("t = %f"%(t))
+            plt.show()  
+        if t==dt*300:
+            fig = plt.figure()
+            ax = Axes3D(fig)
+            z = real(U[:,:,0])
+            y = x
+            ax.plot_surface(xx,yy,z)
+            ax.set_zlim(-.05, .2)
+            ax.set_title("t = %f"%(t))
+            plt.show()          
+            
         
     return U
      
 
 
 #ni=[100,120,140,160,180,200]
-ni=[100]
+ni=[150]
 
 
 for i in range(0,len(ni)):
@@ -217,9 +237,9 @@ for i in range(0,len(ni)):
 
     ######################################################################################lin
     time=0.0
-    dt=4.0/NN**2  #5.0 is the best
+    dt=.4/NN**2  #5.0 is the best
 
-    t1 = dt*50
+    t1 = dt*620
     tmax = time + t1
     nmax= int(round(t1/dt))  
     print (nmax)
@@ -247,32 +267,17 @@ for i in range(0,len(ni)):
         [xx,yy] = np.meshgrid(x,y)
         f = lambda t,xx,yy: -c2*((xx-x_o-M*t*np.cos(alpha))**2+(yy-y_o-M*t*np.sin(alpha))**2)  
         H0 = 1 - (c1**2/(4*c2*g))*np.exp(2*f(t0,xx,yy))
-        U0 = M*np.cos(alpha)+c1*(yy-y_o-M*t0*np.sin(alpha))*np.exp(f(t0,xx,yy))    # 12/8 i changed the tmax to t
-        V0 = M*np.sin(alpha)-c1*(xx-x_o-M*t0*np.cos(alpha))*np.exp(f(t0,xx,yy))
-        return H0,U0,V0
+        
+        return H0
     
 
-    H0,U0,V0 = gauss_swe(40,NN,0.0)
+    H0= gauss_swe(40,NN,0.0)
    
     U0 = np.ones((len(x),len(x)))*.05
-    V0 =np.ones((len(x),len(x))) *.05
+    V0 =np.ones((len(x),len(x)))*.05
     U=spectral_del(nmax,dt, NN, H0,U0,V0,time,tmax)
     
-fig = plt.figure()
-axes = fig.add_subplot(1, 1, 1)
-sol_plot = axes.pcolor(real(H0), cmap=plt.get_cmap('RdBu_r'))
-#ax.plot_surface(X,Y,real(H0_two), cmap=plt.get_cmap('RdBu_r'))
-cbar = fig.colorbar(sol_plot)  
-axes.set_title("H actual t = %f"%(time)) 
-plt.show() 
-    
-fig = plt.figure()
-axes = fig.add_subplot(1, 1, 1)
-sol_plot = axes.pcolor(U[:,:,0], cmap=plt.get_cmap('RdBu_r'))
-#ax.plot_surface(X,Y,real(H0_two), cmap=plt.get_cmap('RdBu_r'))
-cbar = fig.colorbar(sol_plot)  
-axes.set_title("H computed t = %f"%(tmax)) 
-plt.show() 
+
 
 
 
