@@ -144,9 +144,10 @@ def vortex(N,tmax,nmax,dt,g1,M,g,U0,V0,H0):
     G[:,:,2]= G1[:,:,2]
     ###############
     
+    #H01=gauss_swe(15,NN,.01)
      
-    vold=H0#np.zeros((len(x),len(x)))#U0  #H
-    vv=H0  #H at dt
+    vold=H0 #H
+    vv=H0#H0  #H at dt
     vold2temp= U0  # U at 0
     vv2temp = U0 # U at dt
     vold2=U0*H0    # HU
@@ -244,8 +245,10 @@ def vortex(N,tmax,nmax,dt,g1,M,g,U0,V0,H0):
                                             
             vv3_euler[k,:] = vvnew3_euler
             U_euler[k,:,2]= vvnew3_euler 
+
             
-        if t==0:
+            
+        if t==0.0:
             fig = plt.figure()
             ax = Axes3D(fig)
             z = real(U[:,:,0])
@@ -253,33 +256,6 @@ def vortex(N,tmax,nmax,dt,g1,M,g,U0,V0,H0):
             ax.plot_surface(xx,yy,z)
             ax.set_title("t = %f"%(t))
             plt.show()
-        if t==.01:
-            fig = plt.figure()
-            ax = Axes3D(fig)
-            z = real(U[:,:,0])
-            y = x
-            ax.plot_surface(xx,yy,z)
-            ax.set_title("t = %f"%(t))
-            plt.show()
-     
-        if t==.05:
-            fig = plt.figure()
-            ax = Axes3D(fig)
-            z = real(U[:,:,0])
-            y = x
-            ax.plot_surface(xx,yy,z)
-            ax.set_title("t = %f"%(t))
-            plt.show()
-       
-        if t==.1:
-            fig = plt.figure()
-            ax = Axes3D(fig)
-            z = real(U[:,:,0])
-            y = x
-            ax.plot_surface(xx,yy,z)
-            ax.set_title("t = %f"%(t))
-            plt.show()
-           
         if t==.12:
             fig = plt.figure()
             ax = Axes3D(fig)
@@ -287,7 +263,7 @@ def vortex(N,tmax,nmax,dt,g1,M,g,U0,V0,H0):
             y = x
             ax.plot_surface(xx,yy,z)
             ax.set_title("t = %f"%(t))
-            plt.show() 
+            plt.show()   
         if t==.13:
             fig = plt.figure()
             ax = Axes3D(fig)
@@ -295,7 +271,7 @@ def vortex(N,tmax,nmax,dt,g1,M,g,U0,V0,H0):
             y = x
             ax.plot_surface(xx,yy,z)
             ax.set_title("t = %f"%(t))
-            plt.show()
+            plt.show()  
         if t==.14:
             fig = plt.figure()
             ax = Axes3D(fig)
@@ -303,7 +279,7 @@ def vortex(N,tmax,nmax,dt,g1,M,g,U0,V0,H0):
             y = x
             ax.plot_surface(xx,yy,z)
             ax.set_title("t = %f"%(t))
-            plt.show()    
+            plt.show() 
         if t==.15:
             fig = plt.figure()
             ax = Axes3D(fig)
@@ -311,8 +287,32 @@ def vortex(N,tmax,nmax,dt,g1,M,g,U0,V0,H0):
             y = x
             ax.plot_surface(xx,yy,z)
             ax.set_title("t = %f"%(t))
+            plt.show()    
+        if t==.16:
+            fig = plt.figure()
+            ax = Axes3D(fig)
+            z = real(U[:,:,0])
+            y = x
+            ax.plot_surface(xx,yy,z)
+            ax.set_title("t = %f"%(t))
+            plt.show() 
+        if t==.17:
+            fig = plt.figure()
+            ax = Axes3D(fig)
+            z = real(U[:,:,0])
+            y = x
+            ax.plot_surface(xx,yy,z)
+            ax.set_title("t = %f"%(t))
             plt.show()  
-           
+        if t==.19:
+            fig = plt.figure()
+            ax = Axes3D(fig)
+            z = real(U[:,:,0])
+            y = x
+            ax.plot_surface(xx,yy,z)
+            ax.set_title("t = %f"%(t))
+            plt.show()               
+                              
                        
            
         F,G = convert(U,F,G,N,tmax,t,g1,M,g) 
@@ -338,8 +338,8 @@ linf_euler = np.zeros(1)
 N= np.zeros(1)
 k=0
 
-tmax=.16
-NN=256
+tmax=.20
+NN=128
 print (NN)
 x = np.cos(pi*arange(0,NN)/NN); 
 y=x
@@ -353,8 +353,8 @@ dx=np.abs(x[1]-x[0])
 dy=dx
 [xx,yy] = np.meshgrid(x,y)
     
-
-def gauss_swe(sig,NN):
+t0=0
+def gauss_swe(sig,NN,t0):
         
     
         x = np.cos(pi*arange(0,NN)/NN); 
@@ -365,20 +365,20 @@ def gauss_swe(sig,NN):
         g =-50.0#.
         c1=200.0
         c2=100.0
-        alpha= 4*np.pi
+        alpha= np.pi/6#4*np.pi
         x_o=.5#
         y_o=.2#
         [xx,yy] = np.meshgrid(x,y)
         f = lambda t,xx,yy: -c2*((xx-x_o-M*t*np.cos(alpha))**2+(yy-y_o-M*t*np.sin(alpha))**2)  
-        H0 = 1 - (c1**2/(4*c2*g))*np.exp(2*f(0.0,xx,yy))
+        H0 = 1 - (c1**2/(4*c2*g))*np.exp(2*f(t0,xx,yy))
        
         return H0
     
 
-H0 = gauss_swe(15,NN)
+H0 = gauss_swe(15,NN,0)
 
-U0 = np.ones((len(x),len(x))) 
-V0 =np.ones((len(x),len(x)))
+U0 = np.ones((len(x),len(x)))*.05 
+V0 =np.ones((len(x),len(x)))*.05
 
 
    
