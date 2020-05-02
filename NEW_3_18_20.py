@@ -1,6 +1,6 @@
 from mpl_toolkits.mplot3d import Axes3D
 
-
+import seaborn as sns
 from matplotlib.collections import LineCollection
 from numpy import pi,cosh,exp,round,zeros,arange,real
 from numpy.fft import fft,ifft
@@ -18,7 +18,7 @@ def chebfft(v,x):    #this is the first derivative  1-D
     if N==0: return 0
     ii = np.arange(0,N); iir = np.arange(1-N,0); iii = np.array(ii,dtype=int)
     #print (v)
-    V = np.hstack((v,v[N-1:0:-1]))
+    V = np.hstack((v,v[N-1:0:-1]))#
     U = np.real(fft(V))
     W = np.real(ifft(1j*np.hstack((ii,[0.],iir))*U))
     w = np.zeros(N+1)
@@ -379,16 +379,16 @@ def vortex(N,tmax,nmax,dt,g1,M,g):
         U[:,-1,1] =  0#U[0,:,1]
                                                                                                              
             
-    return U, H0_two, H0, U_euler , U0, V0, H0
+    return U, H0_two, U_euler , U0, V0, H0,dt
 
 
 
-ni = [50,55,60,65]
+ni = [50,55,60,65,70]
 #ni = [15,20,25,30,35,40,45]
 #ni= [50]
-linf = np.zeros(4)
-linf_euler = np.zeros(4)
-N= np.zeros(4)
+linf = np.zeros(5)
+linf_euler = np.zeros(5)
+N= np.zeros(5)
 k=0
 for i in ni:
 
@@ -440,7 +440,7 @@ for i in ni:
     dt = (.95*dx)/(np.abs(max_valx+max_valy))
     nmax = int(tmax/(dt))
     
-    U, H0_two, origin, U_euler, U0,V0,H0 = vortex(NN,tmax,nmax,dt,g1,M,g) 
+    U, H0_two, U_euler, U0,V0,H0,dt = vortex(NN,tmax,nmax,dt,g1,M,g) 
     N[k]= dx # dx
     error = np.linalg.norm(dx*(np.abs(real(U[:,:,0]) - real(H0_two))), ord=np.inf)
     error2 = np.linalg.norm(dx*(np.abs(real(U_euler[:,:,0]) - real(H0_two))), ord=np.inf)
@@ -453,21 +453,24 @@ for i in ni:
 
 
 
+ni=np.array(ni)
 
-
+sns.set(font_scale=1.6)
 fig = plt.figure()
 axes = fig.add_subplot(1, 1, 1) 
-order_C = lambda dx, error, order: np.exp(np.log(error) - order * np.log(dx))
-axes.loglog(N, order_C(N[0], linf_euler[0], 1.0) * N**1.0, 'b--', label="1st Order")
-axes.loglog(N, order_C(N[0], linf_euler[0], 2.0) * N**2.0, 'r--', label="2nd Order")     
-axes.loglog(N, order_C(N[0], linf[0], 1.0) * N**1.0, 'b--', label="1st Order")
-axes.loglog(N, order_C(N[0], linf[0], 2.0) * N**2.0, 'r--', label="2nd Order")     
-axes.loglog(N, linf_euler, 'bs', label="Actual Euler")
-axes.loglog(N, linf, 'rs', label="Leap Frog")
-plt.xlabel('dx')
-plt.ylabel('error')
-axes.set_title("Chebyshev Differentiation Method from t = %f to t = %f"%(0.0,tmax))
-axes.legend(loc=4)
+order_C = lambda ni, error, order: np.exp(np.log(error) + order * np.log(ni))
+axes.loglog(ni, order_C(ni[0], linf_euler[0], 1.0) * ni**-1.0, 'b--')
+axes.loglog(ni, order_C(ni[0], linf_euler[0], 2.0) * ni**-2.0, 'r--')     
+axes.loglog(ni, order_C(ni[0], linf[0], 1.0) * ni**-1.0, 'b--', label="1st Order")
+axes.loglog(ni, order_C(ni[0], linf[0], 2.0) * ni**-2.0, 'r--', label="2nd Order")
+axes.loglog(ni, order_C(ni[0], linf[0], 3.0) * ni**-3.0, 'g--', label="3rd Order")        
+axes.loglog(ni, linf_euler, 'bs', label="Euler")
+axes.loglog(ni, linf, 'rs', label="Leapfrog")
+plt.xlabel('N')
+plt.ylabel('Infinity Norm error')
+axes.set_title("Translating Vortex: Chebyshev Differentiation Method from t = %f to t = %f"%(0.0,tmax))
+#axes.legend(loc=1)
+axes.legend(loc='center')
 plt.show()
 
 
@@ -477,22 +480,22 @@ fig = plt.figure()
 axes = fig.add_subplot(1, 1, 1)
 sol_plot = axes.pcolor(real(U_euler[:,:,0]), cmap=plt.get_cmap('RdBu_r'))
 cbar = fig.colorbar(sol_plot)  
-axes.set_title("H computed T = .05 Euler") 
+axes.set_title("h Euler computed t = %f"%(tmax)) 
 plt.show() 
 
 fig = plt.figure()
 axes = fig.add_subplot(1, 1, 1)
 sol_plot = axes.pcolor(real(U[:,:,0]), cmap=plt.get_cmap('RdBu_r'))
 cbar = fig.colorbar(sol_plot)  
-axes.set_title("H computed T = .005") 
+axes.set_title("h Leapfrog computed t = %f"%(tmax)) 
 plt.show() 
 
 
 fig = plt.figure()
 axes = fig.add_subplot(1, 1, 1)
-sol_plot = axes.pcolor(real(origin), cmap=plt.get_cmap('RdBu_r'))
+sol_plot = axes.pcolor(real(H0), cmap=plt.get_cmap('RdBu_r'))
 cbar = fig.colorbar(sol_plot)  
-axes.set_title("H origin") 
+axes.set_title("h origin") 
 plt.show() 
 
 
@@ -501,7 +504,7 @@ axes = fig.add_subplot(1, 1, 1)
     #sol_plot = axes.pcolor(fx_prime_hat, cmap=plt.get_cmap('RdBu_r'))
 sol_plot = axes.pcolor(real(H0_two), cmap=plt.get_cmap('RdBu_r'))
 cbar = fig.colorbar(sol_plot)  
-axes.set_title("H actual t= 0.005") 
+axes.set_title("h actual t = %f"%(tmax)) 
 plt.show() 
 
 u = real(U[:,:,1])/real(U[:,:,0])
@@ -510,7 +513,7 @@ v = real(U[:,:,2])/real(U[:,:,0])
 fig0, ax0 = plt.subplots()
 strm = ax0.streamplot(xx, yy, u, v, color=u, linewidth=2, cmap=plt.cm.autumn)
 fig0.colorbar(strm.lines)
-ax0.set_title('Computed leap frog at t=.005')
+ax0.set_title("Computed Leapfrog at t = %f"%(tmax))
 plt.show()
 
 
@@ -520,14 +523,14 @@ v = real(U_euler[:,:,2])/real(U_euler[:,:,0])
 fig0, ax0 = plt.subplots()
 strm = ax0.streamplot(xx, yy, u, v, color=u, linewidth=2, cmap=plt.cm.autumn)
 fig0.colorbar(strm.lines)
-ax0.set_title('Computed Euler at t=.005')
+ax0.set_title("Computed Euler at t = %f"%(tmax))
 plt.show()
 
 
 fig0, ax0 = plt.subplots()
 strm = ax0.streamplot(xx, yy, U0, V0, color=U0, linewidth=2, cmap=plt.cm.autumn)
 fig0.colorbar(strm.lines)
-ax0.set_title('Actual at t=.005')
+ax0.set_title("Actual at t = %f"%(tmax))
 plt.show()
 
 
