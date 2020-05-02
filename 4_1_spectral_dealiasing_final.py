@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
+import seaborn as sns
+from scipy import signal
+sns.set(font_scale=1.6)
 
 def antialiasing(u_hat,v_hat):
     N = len(u_hat)
@@ -52,7 +55,7 @@ def matrix_antialiasing(h,m):
 
 
 
-def spectral_del(nmax,dt, N, H0,U0,V0,time,tmax):
+def spectral_del(nmax,dt, N, H0,U0,V0,time,tmax,Cour):
     k = zeros(N)
     k[0:int(N/2)] = arange(0,int(N/2)); k[int(N/2)+1:] = arange(int(-N/2)+1,0,1)
 
@@ -66,8 +69,10 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time,tmax):
     U[:,:,2]=H0*V0
 
     
-    n=0     
-    for n in range(0,nmax+1):
+    n=0 
+    t=0    
+    #for n in range(0,nmax+1):
+    while (t <tmax):    
         v = np.fft.fft2(U[:,:,0])
         v1 = np.fft.fft2(U[:,:,1])
         v2 = np.fft.fft2(U[:,:,2])
@@ -90,16 +95,16 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time,tmax):
         g = ik2*dt
         E = np.exp(-dt*ik2*V0); E2 = matrix_antialiasing(E,E)
         suba=real(np.fft.ifft2( v1         ))
-        a = g * np.fft.fft2(matrix_antialiasing(suba,suba))
+        a = g * np.fft.fft2(matrix_antialiasing(suba,suba)/h)
         subb=matrix_antialiasing(E,(v1+a/2))
         subbb=real(np.fft.ifft2( subb       ))
-        b = g * np.fft.fft2(matrix_antialiasing(subbb,subbb))
+        b = g * np.fft.fft2(matrix_antialiasing(subbb,subbb)/h)
         suzz=matrix_antialiasing(E,(v1+b/2))
         suzzz=real(np.fft.ifft2( suzz       ))
-        c = g * np.fft.fft2(matrix_antialiasing(suzzz,suzzz))
+        c = g * np.fft.fft2(matrix_antialiasing(suzzz,suzzz)/h)
         subd=matrix_antialiasing(E2,v1)+matrix_antialiasing(E,c)#E2*v1+E*c
         subdd=real(np.fft.ifft2( subd       ))
-        d = g * np.fft.fft2(matrix_antialiasing(subdd,subdd))
+        d = g * np.fft.fft2(matrix_antialiasing(subdd,subdd)/h)
         v1 = E2*v1 + (E2*a + 2*E*(b+c) + d)/6
         
         h1 = real(np.fft.ifft2(v1))
@@ -107,16 +112,16 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time,tmax):
         g = ik3*dt
         E = np.exp(-dt*ik3*U0); E2 = matrix_antialiasing(E,E)
         suba=real(np.fft.ifft2( v2         ))
-        a = g * np.fft.fft2(matrix_antialiasing(suba,suba))
+        a = g * np.fft.fft2(matrix_antialiasing(suba,suba)/h)
         subb=matrix_antialiasing(E,(v2+a/2))
         subbb=real(np.fft.ifft2( subb       ))
-        b = g * np.fft.fft2(matrix_antialiasing(subbb,subbb))
+        b = g * np.fft.fft2(matrix_antialiasing(subbb,subbb)/h)
         suzz=matrix_antialiasing(E,(v2+b/2))
         suzzz=real(np.fft.ifft2( suzz       ))
-        c = g * np.fft.fft2(matrix_antialiasing(suzzz,suzzz))
+        c = g * np.fft.fft2(matrix_antialiasing(suzzz,suzzz)/h)
         subd=matrix_antialiasing(E2,v2)+matrix_antialiasing(E,c)#E2*v1+E*c
         subdd=real(np.fft.ifft2( subd       ))
-        d = g * np.fft.fft2(matrix_antialiasing(subdd,subdd))
+        d = g * np.fft.fft2(matrix_antialiasing(subdd,subdd)/h)
         v2 = E2*v2 + (E2*a + 2*E*(b+c) + d)/6
         h2 = real(np.fft.ifft2(v2))
         
@@ -127,13 +132,24 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time,tmax):
         ux=U[:,:,1]/U[:,:,0]
         vy=U[:,:,2]/U[:,:,0]
         
-        ux=np.amax(ux)
-        vy=np.amax(vy)
-        print(ux)
-        print(vy)
-        #U[0,:,1] = 0#  U[-1,:,1]
+        r = ux + np.sqrt(np.abs(g*U[:,:,0]))
+        r1 = ux - np.sqrt(np.abs(g*U[:,:,0]))
+        rr = vy + np.sqrt(np.abs(g*U[:,:,0]))
+        rr1 = vy - np.sqrt(np.abs(g*U[:,:,0]))
+        max1=np.amax(np.real(r))
+        max2=np.amax(np.real(r1))
+        max3=np.amax(np.real(rr))
+        max4=np.amax(np.real(rr1))
+        max5=np.amax(np.real(ux))
+        max6=np.amax(np.real(vy))
+        max_valx0=np.maximum(max1,max2)
+        max_valx=np.maximum(max5,max_valx0)
+        max_valy0=np.maximum(max3,max4)
+        max_valy=np.maximum(max6,max_valy0)
+        print(max_valx)
+        print(max_valy)
+        dt = (Cour*dx)/(np.abs(max_valx+max_valy))
         
-        #dt = (.95*dx)/(np.abs(ux+vy))
        
         print("t=")
         print(t)
@@ -144,6 +160,7 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time,tmax):
         print(dt)
         n=n+1
         print(n)
+        print(nmax)
         
         #U[:,0,1] =  0#U[0,:,1]
         #U[:,-1,1] =  0#U[0,:,1] 
@@ -160,34 +177,35 @@ def spectral_del(nmax,dt, N, H0,U0,V0,time,tmax):
        
         
         
-    return U
+    return U,dt
      
 
-ni=[100,120,140,160]
-#ni=[100,120]
-linf=np.zeros(4)
-NN=np.zeros(4)
+#ni=[70]
+#ni=[24,26,28,30,32]
+#ni=[32,34,36,38]
+ni=[40,50,60,70,80,90]
+linf=np.zeros(6)
+NN=np.zeros(6)
 
 for i in range(0,len(ni)):
     N=ni[i]
 
     ######################################################################################lin
     time=0.0
-    dt=8.0/N**2  #5.0 is the best
-  
-    t1 = .01#
+    #dt=.5/N**2
+    t1 = .006#
     tmax = time + t1
-    nmax= int(round(t1/dt))  
-    print (nmax)
-   
+    #nmax= int(round(t1/dt))  
+    #print (nmax)
+    Cour=.62
     M =.9#.1#.5
-    g1 =.2 #between .1 and 1.0
+    g1 =.5 #between .1 and 1.0
     c1=14.0
     c2=11.0
     alpha= np.pi#
     x_o=-2.0#2
     y_o=-1.0#
-    
+    g=10.0
     x = (2*pi/N)*np.linspace(-N/2,N/2,N)#
 #np.cos((pi*arange(0,N))/N); 
     dx=np.abs(x[1]-x[0])
@@ -203,25 +221,56 @@ for i in range(0,len(ni)):
     V0_max = M*np.sin(alpha)-c1*(xx-x_o-M*tmax*np.cos(alpha))*np.exp(f(tmax,xx,yy))  
     
     
+    ux=U0
+    vy=V0
+        
+    r = ux + np.sqrt(np.abs(g*H0))
+    r1 = ux - np.sqrt(np.abs(g*H0))
+    rr = vy + np.sqrt(np.abs(g*H0))
+    rr1 = vy - np.sqrt(np.abs(g*H0))
+    max1=np.amax(np.real(r))
+    max2=np.amax(np.real(r1))
+    max3=np.amax(np.real(rr))
+    max4=np.amax(np.real(rr1))
+    max5=np.amax(np.real(ux))
+    max6=np.amax(np.real(vy))
+    max_valx0=np.maximum(max1,max2)
+    max_valx=np.maximum(max5,max_valx0)
+    max_valy0=np.maximum(max3,max4)
+    max_valy=np.maximum(max6,max_valy0)
+    print(max_valx)
+    print(max_valy)
+    dt = (Cour*dx)/(np.abs(max_valx+max_valy))
+    nmax = int(tmax/(dt))
+    
+    
        
-    U=spectral_del(nmax,dt, N, H0,U0,V0,time,tmax)
-    linf[i]=np.linalg.norm(dt*np.abs((real(U[:,:,0]) - real(H0_max))), ord=np.inf)
-    NN[i]=dt
+    U, dt=spectral_del(nmax,dt, N, H0,U0,V0,time,tmax,Cour)
+    linf[i]=np.linalg.norm(dx*np.abs((real(U[:,:,0]) - real(H0_max))), ord=np.inf)
+    NN[i]=dx
     
 fig = plt.figure()
 axes = fig.add_subplot(1, 1, 1)
 sol_plot = axes.pcolor(real(H0), cmap=plt.get_cmap('RdBu_r'))
 #ax.plot_surface(X,Y,real(H0_two), cmap=plt.get_cmap('RdBu_r'))
 cbar = fig.colorbar(sol_plot)  
-axes.set_title("H actual t = %f"%(time)) 
+axes.set_title("h actual t = %f"%(time)) 
 plt.show() 
+
+fig = plt.figure()
+axes = fig.add_subplot(1, 1, 1)
+sol_plot = axes.pcolor(real(H0_max), cmap=plt.get_cmap('RdBu_r'))
+#ax.plot_surface(X,Y,real(H0_two), cmap=plt.get_cmap('RdBu_r'))
+cbar = fig.colorbar(sol_plot)  
+axes.set_title("h actual t = %f"%(tmax)) 
+plt.show()
     
 fig = plt.figure()
 axes = fig.add_subplot(1, 1, 1)
 sol_plot = axes.pcolor(U[:,:,0], cmap=plt.get_cmap('RdBu_r'))
 #ax.plot_surface(X,Y,real(H0_two), cmap=plt.get_cmap('RdBu_r'))
 cbar = fig.colorbar(sol_plot)  
-axes.set_title("H computed t = %f"%(tmax)) 
+axes.set_title("h computed Runge-Kutta t = %f"%(tmax)) 
 plt.show() 
 
 fig = plt.figure()
@@ -232,42 +281,58 @@ ax.plot_surface(xx,yy,z)
 ax.set_title('3D line plot')
 plt.show()
 
- 
-      
-            
+             
 U1=U[:,:,1]/U[:,:,0]
 V1=U[:,:,2]/U[:,:,0]     
 fig0, ax0 = plt.subplots()
-strm = ax0.streamplot(xx, yy, U1, V1, color=U0, linewidth=2, cmap=plt.cm.autumn)
+strm = ax0.streamplot(xx, yy, U1, V1, color=U1, linewidth=2, cmap=plt.cm.autumn)
 fig0.colorbar(strm.lines)
-ax0.set_title("Computed Streamlines at t = %f"%(tmax))
+ax0.set_title("Computed Runge-Kutta Streamlines at t = %f"%(tmax))
 plt.show()
 
 
      
 fig0, ax0 = plt.subplots()
-strm = ax0.streamplot(xx, yy, U0_max, V0_max, color=U0, linewidth=2, cmap=plt.cm.autumn)
+strm = ax0.streamplot(xx, yy, U0_max, V0_max, color=U0_max, linewidth=2, cmap=plt.cm.autumn)
 fig0.colorbar(strm.lines)
 ax0.set_title("Actual Streamlines at t = %f"%(tmax))
 plt.show()
 
-fig0, ax0 = plt.subplots()
-strm = ax0.streamplot(xx, yy, U0, V0, color=U0, linewidth=2, cmap=plt.cm.autumn)
-fig0.colorbar(strm.lines)
-ax0.set_title("Actual Streamlines at t = 0")
-plt.show()
+#fig0, ax0 = plt.subplots()
+#strm = ax0.streamplot(xx, yy, U0, V0, color=U0, linewidth=2, cmap=plt.cm.autumn)
+#fig0.colorbar(strm.lines)
+#ax0.set_title("Actual Streamlines at t = 0")
+#plt.show()
 
+
+#sns.set(font_scale=1.6)
+#fig = plt.figure()
+#axes = fig.add_subplot(1, 1, 1) 
+#order_C = lambda dx, error, order: np.exp(np.log(error) - order * np.log(dx))   
+#axes.loglog(NN, order_C(NN[0], linf[0], 1.0) * NN**1.0, 'b--', label="1st Order")
+#axes.loglog(NN, order_C(NN[0], linf[0], 2.0) * NN**2.0, 'r--', label="2nd Order")       
+#axes.loglog(N, linf_euler, 'bs', label="Actual Euler")
+#axes.loglog(NN, linf, 'rs', label="Fourth Order Runge-Kutta")
+#plt.xlabel('dt')
+#plt.ylabel('Infinity norm error')
+#axes.set_title("Integrating Factor Method from t = %f to t = %f"%(time,tmax))
+#axes.legend(loc=4)
+#plt.show()    
+
+
+ni=np.array(ni)
+
+sns.set(font_scale=1.6)
 fig = plt.figure()
 axes = fig.add_subplot(1, 1, 1) 
-order_C = lambda dx, error, order: np.exp(np.log(error) - order * np.log(dx))   
-axes.loglog(NN, order_C(NN[0], linf[0], 1.0) * NN**1.0, 'b--', label="1st Order")
-axes.loglog(NN, order_C(NN[0], linf[0], 2.0) * NN**2.0, 'r--', label="2nd Order")  
-axes.loglog(NN, order_C(NN[0], linf[0], 3.0) * NN**3.0, 'g--', label="3rd Order")
-axes.loglog(NN, order_C(NN[0], linf[0], 4.0) * NN**4.0, 'm--', label="4th Order")      
-#axes.loglog(N, linf_euler, 'bs', label="Actual Euler")
-axes.loglog(NN, linf, 'rs', label="Fourth Order Runge Kutta")
-plt.xlabel('dt')
-plt.ylabel('error')
-axes.set_title("Integrating Factor Method from t = %f to t = %f Version 2"%(time,tmax))
-axes.legend(loc=4)
-plt.show()   
+order_C = lambda ni, error, order: np.exp(np.log(error) + order * np.log(ni))    
+axes.loglog(ni, order_C(ni[0], linf[0], 1.0) * ni**-1.0, 'b--', label="1st Order")
+axes.loglog(ni, order_C(ni[0], linf[0], 2.0) * ni**-2.0, 'r--', label="2nd Order")
+axes.loglog(ni, order_C(ni[0], linf[0], 3.0) * ni**-3.0, 'g--', label="3rd Order")        
+axes.loglog(ni, linf, 'rs', label="4th Order Runge-Kutta")
+plt.xlabel('N')
+plt.ylabel('Infinity Norm error')
+axes.set_title("Translating Vortex: Integrating Factor Method  from t = %f to t = %f"%(time,tmax))
+axes.legend(loc=1)
+axes.legend(loc='left')
+plt.show()
