@@ -1,5 +1,5 @@
 # Tsunami
-Tsunami and Storm Surge
+Tsunami and Storm Surge Research Project
 
 The test case is a translating vortex
 
