@@ -7,5 +7,3 @@ The test case is a translating vortex
 
 New_3_18_20_.py:  is Chebyshev differentiation of the shallow water equations
 
-
-This code was used to make the graphs and results for the paper "Fast  Fourier Transform Algorithms for the Nonlinear Shallow Water Equations"
