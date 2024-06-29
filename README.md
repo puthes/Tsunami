@@ -2,6 +2,7 @@
 Tsunami and Storm Surge Research Project
 
 This code was used to make the graphs in "Fast Fourier Transform Algorithms for the Nonlinear Shallow Water Equations"
+DOI: 10.4316/JACSM.202002006
 
 The test case is a translating vortex
 
